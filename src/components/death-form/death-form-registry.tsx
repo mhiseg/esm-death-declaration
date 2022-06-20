@@ -5,29 +5,55 @@ import { Formik } from "formik";
 import { Grid, Row, Column, Button, Form } from "carbon-components-react";
 import { useTranslation } from "react-i18next";
 import FieldForm from "./field/field-component";
+import { DeathDeclarationContext } from "./death-declaration-context";
+import { Person, showToast } from "@openmrs/esm-framework";
+import { killPatient } from "../patient-ressources";
 
 
+interface PatientIdentifier {
+    uuid?: string;
+    identifier: string;
+    identifierType: string | any;
+    location?: string;
+    preferred?: boolean;
+}
 
-const DeathFormRegistry = () => {
+type Patient = {
+    uuid?: string;
+    identifiers: Array<PatientIdentifier>;
+    person: Person;
+    voided?: boolean;
+}
+
+export interface DeathFormProps {
+    patient: any;
+}
+
+const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
     const { t } = useTranslation();
+    const abortController = new AbortController();
 
+    console.log(patient, '====================')
 
 
     const [initialV, setInitiatV] = useState({
-        confirmation: "",
+        codePatient: patient.identifier[0].value,
+        identifier: patient.identifier[1]?.value || '',
+        familyName: patient.name[0].family,
+        givenName: patient.name[0].given,
+        uuid: patient.id,
         cause: "",
         deathDate: "",
         deathPlace: "",
-        infoSource: "",
-        observation: "",
+        secondaryCause: "",
+        terciaryCause: "",
     });
 
     const deathSchema = Yup.object().shape({
-        confirmation: Yup.string(),
-        cause: Yup.string(),
-        deathDate: Yup.string(),
-        infoSource: Yup.string(),
-        observation: Yup.object(),
+        cause: Yup.string().required("Vous devriez fournir une cause pour la mort"),
+        deathDate: Yup.date().required("Vous devriez fournir une date pour la mort"),
+        secondaryCause: Yup.string(),
+        terciaryCause: Yup.string(),
     })
 
 
@@ -35,7 +61,17 @@ const DeathFormRegistry = () => {
         <Formik
             initialValues={initialV}
             validationSchema={deathSchema}
-            onSubmit={()=>{""}}
+            onSubmit={(values, { resetForm }) => {
+                console.log(values)
+                killPatient(abortController, values.uuid, new Date(values.deathDate), values.cause).then(res =>
+                    showToast({
+                        title: t('successfullyAdded', 'Successfully added'),
+                        kind: 'success',
+                        description: 'Patient save succesfully',
+                    })
+                ).catch(error => showToast({ description: error.message }))
+                resetForm();
+            }}
 
         >
             {(formik) => {
@@ -50,33 +86,45 @@ const DeathFormRegistry = () => {
                 } = formik;
                 return (
                     <Form name="form" className={styles.cardForm} onSubmit={handleSubmit}>
-                        <Grid fullWidth={true} className={styles.p0}>
+                        <DeathDeclarationContext.Provider value={{ setFieldValue: setFieldValue }}>
+                            <Grid fullWidth={true} className={styles.p0}>
+                                <Row>
+                                    <Column className={styles.firstColSyle} lg={6}>
+                                        <label>{t("NumberPatient") + '  ' + values.codePatient}</label>
+                                    </Column>
+                                    <Column className={styles.secondColStyle} lg={6}>
+                                        <label>{t("IdentifierPatient") + '  ' + values.identifier}</label>
+                                    </Column>
+                                </Row>
+                                <Row>
+                                    <Column className={styles.firstColSyle} lg={6}>
+                                        <label>{t("FamilyName") + '  ' + values.familyName}</label>
+                                    </Column>
+                                    <Column className={styles.secondColStyle} lg={6}>
+                                        <label>{t("GivenName") + '  ' + values.givenName}</label>
+                                    </Column>
+                                </Row>
                                 <Row>
                                     <Column className={styles.firstColSyle} lg={6}>
                                         {FieldForm("deathPlace")}
                                     </Column>
                                     <Column className={styles.secondColStyle} lg={6}>
-                                        {FieldForm("deathCause")}
-                                    </Column>
-                                </Row>
-                                <Row>
-                                    <Column className={styles.firstColSyle} lg={6}>
                                         {FieldForm("deathDate")}
-                                    </Column>
-                                    <Column className={styles.secondColStyle} lg={6}>
-                                        {FieldForm("source")}
                                     </Column>
                                 </Row>
 
                                 <Row>
                                     <Column className={styles.firstColSyle} lg={6}>
-                                        {FieldForm("confirmation")}
+                                        {FieldForm("deathCause")}
                                     </Column>
                                 </Row>
 
                                 <Row>
                                     <Column>
-                                    {FieldForm("observation")}
+                                        {FieldForm("observation-2")}
+                                    </Column>
+                                    <Column>
+                                        {FieldForm("observation-3")}
                                     </Column>
                                 </Row>
                                 <Row>
@@ -91,7 +139,8 @@ const DeathFormRegistry = () => {
                                                         size="sm"
                                                         isSelected={true}
                                                     >
-                                                        Annuler
+
+                                                        {t("cancelButton", "Annuler")}
                                                     </Button>
                                                     <Button
                                                         className={styles.buttonStyle1}
@@ -101,18 +150,19 @@ const DeathFormRegistry = () => {
                                                         isSelected={true}
                                                         disabled={!(dirty && isValid)}
                                                     >
-                                                        Enregistrer
+                                                        {t("confirmButton", "Enregistrer")}
                                                     </Button>
                                                 </div>
                                             </Column>
                                         </Row>
                                     </Column>
                                 </Row>
-                        </Grid>
+                            </Grid>
+                        </DeathDeclarationContext.Provider>
                     </Form>
                 );
             }}
-        </Formik>
+        </Formik >
     );
 }
 

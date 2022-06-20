@@ -16,13 +16,12 @@
      moduleName,
    };
  
-   defineConfigSchema(moduleName, configSchema);
  
    return {
      pages: [
        {
-         load: getAsyncLifecycle(() => import("./death-declaration-component"), options),
-         route: "death/declaration",
+         load: getAsyncLifecycle(() => import("./root.component"), options),
+         route: "death/declare/patient",
        },
      ]
    };
