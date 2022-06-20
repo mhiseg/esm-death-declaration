@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { SelectCustom } from "../../input/custom-input/custom-select/custom-selected-component";
+import { SelectInput } from "../../input/basic-input/select/select-input.component";
 import styles from '../field.scss';
 
 
@@ -14,10 +14,11 @@ export const DeathCauseField: React.FC = () => {
 
   return (
     <>
-      <SelectCustom
+      <SelectInput
+        className={styles.margin_field}
         options={["projectile", "crise cardiaque", "Covid"]}
         label={t('Select') + ' ' + question}
-        name="deathCause"
+        name="cause"
       />
     </>
   );

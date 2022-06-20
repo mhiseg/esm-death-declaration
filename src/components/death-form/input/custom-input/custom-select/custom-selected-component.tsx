@@ -32,7 +32,7 @@ export const SelectCustom: React.FC<InputSelectProps> = ({ name, options, label,
         className={className}
         hideLabel={true}
         invalid={!!(meta.error && meta.touched)}
-        invalidText={meta.error}
+        invalidText={t("messageErrorDeathCause",meta.error)}
       >
         {selectOptions}
       </Select>
