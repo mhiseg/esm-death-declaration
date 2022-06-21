@@ -90,18 +90,18 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
                             <Grid fullWidth={true} className={styles.p0}>
                                 <Row>
                                     <Column className={styles.firstColSyle} lg={6}>
-                                        <label>{t("NumberPatient") + '  ' + values.codePatient}</label>
+                                        <p>{t("NumberPatient") + ' : ' + values.codePatient}</p>
                                     </Column>
                                     <Column className={styles.secondColStyle} lg={6}>
-                                        <label>{t("IdentifierPatient") + '  ' + values.identifier}</label>
+                                        <p className={`${styles.ml},${styles.ml}`}>{t("IdentifierPatient") + ' : ' + values.identifier}</p>
                                     </Column>
                                 </Row>
                                 <Row>
                                     <Column className={styles.firstColSyle} lg={6}>
-                                        <label>{t("FamilyName") + '  ' + values.familyName}</label>
+                                        <p className={styles.mt}>{t("givenNameLabelText") + ' : ' + values.givenName}</p>
                                     </Column>
                                     <Column className={styles.secondColStyle} lg={6}>
-                                        <label>{t("GivenName") + '  ' + values.givenName}</label>
+                                        <p className={styles.mt}>{t("familyNameLabelText") + ' : ' + values.familyName}</p>
                                     </Column>
                                 </Row>
                                 <Row>
@@ -120,10 +120,10 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
                                 </Row>
 
                                 <Row>
-                                    <Column>
+                                    <Column className={styles.firstColSyle}>
                                         {FieldForm("observation-2")}
                                     </Column>
-                                    <Column>
+                                    <Column className={styles.secondColStyle}>
                                         {FieldForm("observation-3")}
                                     </Column>
                                 </Row>
