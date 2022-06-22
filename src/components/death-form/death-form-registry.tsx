@@ -32,10 +32,6 @@ export interface DeathFormProps {
 const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
     const { t } = useTranslation();
     const abortController = new AbortController();
-
-    console.log(patient.identifiers[0], '====================')
-
-
     const [initialV, setInitiatV] = useState({
         codePatient: patient.identifiers[0].identifier,
         identifier: patient.identifiers[1]?.display || '',
@@ -55,7 +51,6 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
         secondaryCause: Yup.string(),
         terciaryCause: Yup.string(),
     })
-
     const declareDeath = (values) => {
         let person = {
             dead: true,
