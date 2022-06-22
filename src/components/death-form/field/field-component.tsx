@@ -8,7 +8,7 @@ import { NIFfield } from './identifier/patient-nif';
 import { FamilyNameField } from './name/familyname-field.component';
 import { GivenNameField } from './name/givenname-field.component';
 import { SecondaryCauseField } from './death-cause/secondary-cause';
-import { TerciaryCauseField } from './death-cause/terciary-cause';
+import { OriginCauseField } from './death-cause/origin-cause';
 
 
 
@@ -16,24 +16,24 @@ import { TerciaryCauseField } from './death-cause/terciary-cause';
 const FieldForm = (name: string, value?, methode?) => {
   switch (name) {
     case 'nif':
-      return <NIFfield nif={value}/>;
+      return <NIFfield nif={value} />;
     case 'code':
-      return <CodeField code={value}/>;
+      return <CodeField code={value} />;
     case 'givenName':
-      return <GivenNameField  name={name}/>;
+      return <GivenNameField name={name} />;
     case 'familyName':
-      return <FamilyNameField name={name}/>; 
+      return <FamilyNameField name={name} />;
     case 'deathPlace':
       return <DeathPlaceField />;
     case 'deathCause':
-      return <DeathCauseField/>;
+      return <DeathCauseField />;
     case 'deathDate':
-      return <DeathDateField minDate = {value} />
+      return <DeathDateField minDate={value} />
+    case 'observation-1':
+      return <OriginCauseField />;
     case 'observation-2':
       return <SecondaryCauseField />;
-    case 'observation-3':
-      return <TerciaryCauseField />;
-     default:
+    default:
       return <Unknow />;
   }
 }

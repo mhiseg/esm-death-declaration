@@ -8,7 +8,7 @@ import FieldForm from "./field/field-component";
 import { DeathDeclarationContext } from "./death-declaration-context";
 import { Person, showToast } from "@openmrs/esm-framework";
 import { killPatient } from "../patient-ressources";
-
+import { deathValidated, originCauseUuid, secondaryCauseUuid } from "../constants";
 
 interface PatientIdentifier {
     uuid?: string;
@@ -33,20 +33,20 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
     const { t } = useTranslation();
     const abortController = new AbortController();
 
-    console.log(patient, '====================')
+    console.log(patient.identifiers[0], '====================')
 
 
     const [initialV, setInitiatV] = useState({
-        codePatient: patient.identifier[0].value,
-        identifier: patient.identifier[1]?.value || '',
-        familyName: patient.name[0].family,
-        givenName: patient.name[0].given,
-        uuid: patient.id,
+        codePatient: patient.identifiers[0].identifier,
+        identifier: patient.identifiers[1]?.display || '',
+        familyName: patient.person.preferredName.familyName,
+        givenName: patient.person.preferredName.givenName,
+        uuid: patient.uuid,
         cause: "",
         deathDate: "",
         deathPlace: "",
         secondaryCause: "",
-        terciaryCause: "",
+        origin: "",
     });
 
     const deathSchema = Yup.object().shape({
@@ -56,6 +56,32 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
         terciaryCause: Yup.string(),
     })
 
+    const declareDeath = (values) => {
+        let person = {
+            dead: true,
+            deathDate: new Date(values.deathDate).toISOString(),
+            causeOfDeath: values.cause,
+            attributes: []
+        }
+        if (values.originCause) {
+            person.attributes.push({ attributeType: originCauseUuid, value: values.originCause })
+        }
+        if (!values.originCause && values.secondaryCause) {
+            person.attributes.push({ attributeType: originCauseUuid, value: values.originCause })
+
+        } else if (values.originCause && values.secondaryCause) {
+            person.attributes.push({ attributeType: secondaryCauseUuid, value: values.secondaryCause })
+        }
+        console.log(person, 'to kil')
+
+        killPatient(abortController, values.uuid, person).then(res =>
+            showToast({
+                title: t('successfullyAdded', 'Successfully added'),
+                kind: 'success',
+                description: 'Patient save succesfully',
+            })
+        ).catch(error => showToast({ description: error.message }))
+    }
 
     return (
         <Formik
@@ -63,16 +89,9 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
             validationSchema={deathSchema}
             onSubmit={(values, { resetForm }) => {
                 console.log(values)
-                killPatient(abortController, values.uuid, new Date(values.deathDate), values.cause).then(res =>
-                    showToast({
-                        title: t('successfullyAdded', 'Successfully added'),
-                        kind: 'success',
-                        description: 'Patient save succesfully',
-                    })
-                ).catch(error => showToast({ description: error.message }))
+                declareDeath(values)
                 resetForm();
             }}
-
         >
             {(formik) => {
                 const {
@@ -90,11 +109,14 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
                             <Grid fullWidth={true} className={styles.p0}>
                                 <Row>
                                     <Column className={styles.firstColSyle} lg={6}>
-                                        <p>{t("NumberPatient") + ' : ' + values.codePatient}</p>
+                                        <p>{t("codePatient") + ' : ' + values.codePatient}</p>
                                     </Column>
-                                    <Column className={styles.secondColStyle} lg={6}>
-                                        <p className={`${styles.ml},${styles.ml}`}>{t("IdentifierPatient") + ' : ' + values.identifier}</p>
-                                    </Column>
+                                    {
+                                        values.identifier &&
+                                        <Column className={styles.secondColStyle} lg={6}>
+                                            <p className={`${styles.ml},${styles.ml}`}>{t("identifier") + ' : ' + values.identifier}</p>
+                                        </Column>
+                                    }
                                 </Row>
                                 <Row>
                                     <Column className={styles.firstColSyle} lg={6}>
@@ -121,10 +143,10 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
 
                                 <Row>
                                     <Column className={styles.firstColSyle}>
-                                        {FieldForm("observation-2")}
+                                        {FieldForm("observation-1")}
                                     </Column>
                                     <Column className={styles.secondColStyle}>
-                                        {FieldForm("observation-3")}
+                                        {FieldForm("observation-2")}
                                     </Column>
                                 </Row>
                                 <Row>

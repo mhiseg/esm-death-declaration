@@ -4,10 +4,12 @@
   "messageErrorDeathCause": "La cause du décès ne peut pas être vide.",
   "messageErrorDeathDate" : "La date de décès ne peut pas être vide",
   "secondaryCauseLabelText":"Cause secondaire",
-  "terciaryCauseLabelText": "Cause terciaire",
+  "originCauseLabelText": "Cause Initiale",
   "givenNameLabelText":"Prénom",
   "familyNameLabelText": "Nom",
   "Select":"Sélectionner",
   "cancelButton": "Annuler",
-  "confirmButton": "Enregistrer"
+  "confirmButton": "Enregistrer",
+  "identifier": "Identifiant",
+  "codePatient":"numéro dossier"
 }

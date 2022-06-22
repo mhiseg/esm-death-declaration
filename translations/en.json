@@ -6,8 +6,10 @@
   "messageErrorDeathCause": "Death cause can't be nul",
   "messageErrorDeathDate": "Death date can't be null",
   "secondaryCauseLabelText": "Secondary cause",
-  "terciaryCauseLabelText": "Terciary cause",
+  "originCauseLabelText": "Origin cause",
   "Select":"Select",
   "cancelButton": "Cancel",
-  "confirmButton": "Confirm"
+  "confirmButton": "Confirm",
+  "identifier": "Identifier",
+  "codePatient":"Number"
 }

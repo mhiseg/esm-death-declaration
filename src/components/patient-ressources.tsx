@@ -21,15 +21,18 @@ export async function fetchConceptByUuid(conceptUuid: string, lang: string) {
         method: "GET",
     });
 }
-export function killPatient(abortController: AbortController, patient: string, date: Date, causeOfDeath: string) {
-    return openmrsFetch(`/ws/rest/v1/person/${patient}`, {
+
+export function killPatient(abortController: AbortController, uuid: string, person) {
+    return openmrsFetch(`/ws/rest/v1/person/${uuid}`, {
         method: 'POST',
-        body: {
-            dead: true,
-            deathDate: date.toISOString(),
-            causeOfDeath: causeOfDeath,
-        },
+        body: person,
         headers: { 'Content-Type': 'application/json' },
         signal: abortController.signal
-    });
+    })
+}
+export function fetchPatient(patientUuid) {
+    if (patientUuid) {
+        return openmrsFetch(`${BASE_WS_API_URL}patient/${patientUuid}?v=full&lang=${localStorage.getItem("i18nextLng")}`, { method: 'GET' });
+    }
+    return Promise.resolve(null);
 }
