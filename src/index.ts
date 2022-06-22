@@ -22,6 +22,7 @@
        {
          load: getAsyncLifecycle(() => import("./root.component"), options),
          route: "death/declare/patient",
+         privilege: "App: death.management"
        },
      ]
    };

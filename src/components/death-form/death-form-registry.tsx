@@ -72,13 +72,11 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
         } else if (values.originCause && values.secondaryCause) {
             person.attributes.push({ attributeType: secondaryCauseUuid, value: values.secondaryCause })
         }
-        console.log(person, 'to kil')
-
         killPatient(abortController, values.uuid, person).then(res =>
             showToast({
-                title: t('successfullyAdded', 'Successfully added'),
+                title: t('successfullyKill', 'Successfully kill'),
                 kind: 'success',
-                description: 'Patient save succesfully',
+                description: 'Patient kill succesfully',
             })
         ).catch(error => showToast({ description: error.message }))
     }
