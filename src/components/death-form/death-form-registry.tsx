@@ -43,13 +43,24 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
         deathPlace: "",
         secondaryCause: "",
         origin: "",
+        deathTime: ""
     });
+
+
 
     const deathSchema = Yup.object().shape({
         cause: Yup.string().required("Vous devriez fournir une cause pour la mort"),
-        deathDate: Yup.date().required("Vous devriez fournir une date pour la mort"),
+        deathDate: Yup.date(),
         secondaryCause: Yup.string(),
         terciaryCause: Yup.string(),
+        deathTime: Yup.string(),
+    }).test("valide deathTime ", (value, { createError }) => {
+        if (!value.deathDate && value.deathTime) {
+            return createError({
+                path: 'deathDate',
+                message: ("messageErrorDeathDate"),
+            });
+        }
     })
     const declareDeath = (values) => {
         let person = {
@@ -82,7 +93,7 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
             validationSchema={deathSchema}
             onSubmit={(values, { resetForm }) => {
                 console.log(values)
-                declareDeath(values)
+                // declareDeath(values)
                 resetForm();
             }}
         >
@@ -98,7 +109,7 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
                 } = formik;
                 return (
                     <Form name="form" className={styles.cardForm} onSubmit={handleSubmit}>
-                        <DeathDeclarationContext.Provider value={{ setFieldValue: setFieldValue }}>
+                        <DeathDeclarationContext.Provider value={{ setFieldValue: setFieldValue, date: new Date(values.deathDate), time: values.deathTime }}>
                             <Grid fullWidth={true} className={styles.p0}>
                                 <Row>
                                     <Column className={styles.firstColSyle} lg={6}>
@@ -119,16 +130,20 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
                                         <p className={styles.mt}>{t("familyNameLabelText") + ' : ' + values.familyName}</p>
                                     </Column>
                                 </Row>
+
                                 <Row>
                                     <Column className={styles.firstColSyle} lg={6}>
-                                        {FieldForm("deathPlace")}
-                                    </Column>
-                                    <Column className={styles.secondColStyle} lg={6}>
                                         {FieldForm("deathDate")}
+                                    </Column>
+                                    <Column className={styles.firstColSyle} lg={6}>
+                                        {FieldForm("deathTime")}
                                     </Column>
                                 </Row>
 
                                 <Row>
+                                    <Column className={styles.firstColSyle} lg={6}>
+                                        {FieldForm("deathPlace")}
+                                    </Column>
                                     <Column className={styles.firstColSyle} lg={6}>
                                         {FieldForm("deathCause")}
                                     </Column>

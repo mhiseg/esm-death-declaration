@@ -17,18 +17,20 @@ const DeathDeclation: React.FC = () => {
     const to: NavigateOptions = { to: window.spaBase + "/death/search" };
 
     const toSearchPatient = (patient) => {
-        const isValidate = patient.person?.attributes.find((attribute) => attribute.attributeType.uuid === deathValidated);
-        if (patient.uuid === undefined || isValidate)
-            navigate(to);
+        if (patient) {
+            const isValidate = patient.person?.attributes.find((attribute) => attribute.attributeType.uuid === deathValidated);
+            if (patient.uuid === undefined || isValidate)
+                navigate(to);
+        }
     }
 
     const getFormPatient = () => {
-        toSearchPatient(patientSearch.data)
+        toSearchPatient(patientSearch?.data)
         return (
             <>
                 <h4 className={`title-page`}>{t('declareDeathTitle', 'Declare a death')}</h4>
                 <div className={`mhiseg-main-content `}>
-                    <DeathFormRegistry patient={patientSearch.data} />
+                    <DeathFormRegistry patient={patientSearch?.data} />
                 </div>
             </>
         );

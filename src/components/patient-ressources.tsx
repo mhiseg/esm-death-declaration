@@ -23,6 +23,7 @@ export async function fetchConceptByUuid(conceptUuid: string, lang: string) {
 }
 
 export function killPatient(abortController: AbortController, uuid: string, person) {
+    console.log(person);
     return openmrsFetch(`/ws/rest/v1/person/${uuid}`, {
         method: 'POST',
         body: person,

@@ -9,8 +9,7 @@ import { FamilyNameField } from './name/familyname-field.component';
 import { GivenNameField } from './name/givenname-field.component';
 import { SecondaryCauseField } from './death-cause/secondary-cause';
 import { OriginCauseField } from './death-cause/origin-cause';
-
-
+import { DeathTimeField } from './death-date/time-picker';
 
 
 const FieldForm = (name: string, value?, methode?) => {
@@ -23,6 +22,8 @@ const FieldForm = (name: string, value?, methode?) => {
       return <GivenNameField name={name} />;
     case 'familyName':
       return <FamilyNameField name={name} />;
+      case 'deathTime':
+        return <DeathTimeField />;  
     case 'deathPlace':
       return <DeathPlaceField />;
     case 'deathCause':
