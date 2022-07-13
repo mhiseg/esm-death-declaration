@@ -7,8 +7,9 @@ import { useTranslation } from "react-i18next";
 import FieldForm from "./field/field-component";
 import { DeathDeclarationContext } from "./death-declaration-context";
 import { Person, showToast } from "@openmrs/esm-framework";
-import { killPatient } from "../patient-ressources";
-import { deathValidated, originCauseUuid, secondaryCauseUuid } from "../constants";
+import { formatPatient, killPatient } from "../patient-ressources";
+import { originCauseUuid, secondaryCauseUuid } from "../constants";
+import { useParams } from "react-router-dom";
 
 interface PatientIdentifier {
     uuid?: string;
@@ -30,27 +31,19 @@ export interface DeathFormProps {
 }
 
 const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
+    const param: { patientUuid?: string } = useParams();
     const { t } = useTranslation();
+
     const abortController = new AbortController();
-    const [initialV, setInitiatV] = useState({
-        codePatient: patient.identifiers[0].identifier,
-        identifier: patient.identifiers[1]?.display || '',
-        familyName: patient.person.preferredName.familyName,
-        givenName: patient.person.preferredName.givenName,
-        uuid: patient.uuid,
-        cause: "",
-        deathDate: "",
-        deathPlace: "",
-        secondaryCause: "",
-        origin: "",
-        deathTime: ""
-    });
-
-
+    const [initialV, setInitialValue] = useState(formatPatient(patient));
 
     const deathSchema = Yup.object().shape({
+        codePatient: Yup.string(),
+        identifier: Yup.string(),
+        familyName: Yup.string(),
+        givenName: Yup.string(),
         cause: Yup.string().required("Vous devriez fournir une cause pour la mort"),
-        deathDate: Yup.date(),
+        deathDate: Yup.date().required("messageErrorDeathDate"),
         secondaryCause: Yup.string(),
         terciaryCause: Yup.string(),
         deathTime: Yup.string(),
@@ -62,6 +55,8 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
             });
         }
     })
+
+
     const declareDeath = (values) => {
         let person = {
             dead: true,
@@ -89,6 +84,7 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
 
     return (
         <Formik
+            enableReinitialize
             initialValues={initialV}
             validationSchema={deathSchema}
             onSubmit={(values, { resetForm }) => {
@@ -101,41 +97,38 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
                 const {
                     values,
                     handleSubmit,
-                    errors,
-                    touched,
                     setFieldValue,
                     isValid,
                     dirty,
                 } = formik;
                 return (
                     <Form name="form" className={styles.cardForm} onSubmit={handleSubmit}>
-                        <DeathDeclarationContext.Provider value={{ setFieldValue: setFieldValue, date: new Date(values.deathDate), time: values.deathTime }}>
+                        <DeathDeclarationContext.Provider value={{
+                            setFieldValue: setFieldValue,
+                            date: new Date(values.deathDate), time: values.deathTime, setInitialV: setInitialValue, formState: param
+                        }}>
                             <Grid fullWidth={true} className={styles.p0}>
                                 <Row>
                                     <Column className={styles.firstColSyle} lg={6}>
-                                        <p>{t("codePatient") + ' : ' + values.codePatient}</p>
+                                        {FieldForm("givenName")}
                                     </Column>
-                                    {
-                                        values.identifier &&
-                                        <Column className={styles.secondColStyle} lg={6}>
-                                            <p className={`${styles.ml},${styles.ml}`}>{t("identifier") + ' : ' + values.identifier}</p>
-                                        </Column>
-                                    }
+                                    <Column className={styles.secondColStyle} lg={6}>
+                                        {FieldForm("familyName")}
+                                    </Column>
                                 </Row>
                                 <Row>
                                     <Column className={styles.firstColSyle} lg={6}>
-                                        <p className={styles.mt}>{t("givenNameLabelText") + ' : ' + values.givenName}</p>
+                                        {FieldForm("code",values.codePatient)}
                                     </Column>
                                     <Column className={styles.secondColStyle} lg={6}>
-                                        <p className={styles.mt}>{t("familyNameLabelText") + ' : ' + values.familyName}</p>
+                                        {FieldForm("nif")}
                                     </Column>
                                 </Row>
-
                                 <Row>
                                     <Column className={styles.firstColSyle} lg={6}>
                                         {FieldForm("deathDate")}
                                     </Column>
-                                    <Column className={styles.firstColSyle} lg={6}>
+                                    <Column className={styles.secondColSyle} lg={6}>
                                         {FieldForm("deathTime")}
                                     </Column>
                                 </Row>
@@ -144,7 +137,7 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
                                     <Column className={styles.firstColSyle} lg={6}>
                                         {FieldForm("deathPlace")}
                                     </Column>
-                                    <Column className={styles.firstColSyle} lg={6}>
+                                    <Column className={styles.secondColSyle} lg={6}>
                                         {FieldForm("deathCause")}
                                     </Column>
                                 </Row>

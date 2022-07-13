@@ -37,3 +37,37 @@ export function fetchPatient(patientUuid) {
     }
     return Promise.resolve(null);
 }
+
+
+export function formatPatient(patient) {
+    return {
+        codePatient: patient?.identifiers[0]?.identifier || '',
+        identifier: patient?.identifiers[1]?.display || '',
+        familyName: patient?.person?.names[0]?.familyName || '',
+        givenName: patient?.person?.names[0]?.givenName || '',
+        uuid: patient?.uuid || null,
+        cause: "",
+        deathDate: "",
+        deathPlace: "",
+        secondaryCause: "",
+        origin: "",
+        deathTime: "",
+    }
+}
+
+export function searchPatient(identifier) {
+    if (identifier) {
+        return openmrsFetch(`${BASE_WS_API_URL}patient/${identifier}?v=full&lang=${localStorage.getItem("i18nextLng")}`, { method: 'GET' });
+    }
+    return Promise.resolve(null);
+}
+
+export async function getPatient(query) {
+        const data = await openmrsFetch(
+            `${BASE_WS_API_URL}patient?v=full&q=${query}&limit=1`,
+            {
+                method: "GET",
+            }
+        );
+    return data?.data?.results[0];
+}

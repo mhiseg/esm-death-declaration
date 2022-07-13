@@ -9,6 +9,9 @@ const RootComponent: React.FC = () => {
       <Route exact path="/:patientUuid">
         <DeathDeclation />
       </Route>
+      <Route exact path="/">
+        <DeathDeclation />
+      </Route>
     </BrowserRouter>
   );
 };

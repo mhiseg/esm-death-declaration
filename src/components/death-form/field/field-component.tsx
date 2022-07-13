@@ -12,7 +12,7 @@ import { OriginCauseField } from './death-cause/origin-cause';
 import { DeathTimeField } from './death-date/time-picker';
 
 
-const FieldForm = (name: string, value?, methode?) => {
+const FieldForm = (name: string, value?) => {
   switch (name) {
     case 'nif':
       return <NIFfield nif={value} />;

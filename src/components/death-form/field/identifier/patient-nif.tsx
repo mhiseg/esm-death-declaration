@@ -14,8 +14,8 @@ export const NIFfield: React.FC<CodeFieldProps> = ({ nif }) => {
     <>
       <Input
         className={styles.margin_field}
-        id="code"
-        name="code"
+        id="identifier"
+        name="identifier"
         labelText={"code"}
         light={true}
         placeholder={"NIF: " + nif}
