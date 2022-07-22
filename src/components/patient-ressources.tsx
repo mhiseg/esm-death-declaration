@@ -1,7 +1,15 @@
 import { getCurrentUser, openmrsFetch } from "@openmrs/esm-framework";
 import { mergeMap } from "rxjs/operators";
-import { deathValidated } from "./constants";
+import { deathValidatedUuid } from "./constants";
 const BASE_WS_API_URL = '/ws/rest/v1/';
+
+export interface PatientIdentifier {
+    uuid?: string;
+    identifier: string;
+    identifierType: string | any;
+    location?: string;
+    preferred?: boolean;
+}
 
 export function getSynchronizedCurrentUser(opts: any) {
     return getCurrentUser(opts).pipe(
@@ -63,11 +71,19 @@ export function searchPatient(identifier) {
 }
 
 export async function getPatient(query) {
-        const data = await openmrsFetch(
-            `${BASE_WS_API_URL}patient?v=full&q=${query}&limit=1`,
-            {
-                method: "GET",
-            }
-        );
+    const data = await openmrsFetch(
+        `${BASE_WS_API_URL}patient?v=full&q=${query}&limit=1`,
+        {
+            method: "GET",
+        }
+    );
     return data?.data?.results[0];
+}
+export async function addPatientIdentifier(abortController: AbortController, patientUuid: string, uuid: string, identifier: PatientIdentifier) {
+    await openmrsFetch(`${BASE_WS_API_URL}patient/${patientUuid}/identifier/${uuid == null ? "" : uuid}`, {
+        method: 'POST',
+        body: identifier,
+        headers: { 'Content-Type': 'application/json' },
+        signal: abortController.signal
+    });
 }

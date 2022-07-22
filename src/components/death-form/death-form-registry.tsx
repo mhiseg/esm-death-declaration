@@ -6,10 +6,11 @@ import { Grid, Row, Column, Button, Form } from "carbon-components-react";
 import { useTranslation } from "react-i18next";
 import FieldForm from "./field/field-component";
 import { DeathDeclarationContext } from "./death-declaration-context";
-import { Person, showToast } from "@openmrs/esm-framework";
-import { formatPatient, killPatient } from "../patient-ressources";
-import { originCauseUuid, secondaryCauseUuid } from "../constants";
+import { navigate, Person, showToast } from "@openmrs/esm-framework";
+import { addPatientIdentifier, formatPatient, killPatient } from "../patient-ressources";
+import { deathValidatedUuid, deathValidatedValue, originCauseUuid, secondaryCauseUuid } from "../constants";
 import { useParams } from "react-router-dom";
+import { to } from "../../death-declaration-component";
 
 interface PatientIdentifier {
     uuid?: string;
@@ -73,13 +74,18 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
         } else if (values.originCause && values.secondaryCause) {
             person.attributes.push({ attributeType: secondaryCauseUuid, value: values.secondaryCause })
         }
-        killPatient(abortController, values.uuid, person).then(res =>
-            showToast({
-                title: t('successfullyKill', 'Successfully kill'),
-                kind: 'success',
-                description: 'Patient kill succesfully',
+
+        killPatient(abortController, values.uuid, person).then(res => {
+            addPatientIdentifier(abortController, values.uuid, null, { identifier: deathValidatedValue, identifierType: deathValidatedUuid }).then(() => {
+                navigate(to);
+                showToast({
+                    title: t('successfullyKill', 'Successfully kill'),
+                    kind: 'success',
+                    description: 'Patient kill succesfully',
+                })
             })
-        ).catch(error => showToast({ description: error.message }))
+        })
+        .catch(error => showToast({ description: error.message }))
     }
 
     return (
@@ -88,9 +94,7 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
             initialValues={initialV}
             validationSchema={deathSchema}
             onSubmit={(values, { resetForm }) => {
-                console.log(values)
-                // declareDeath(values)
-                resetForm();
+                declareDeath(values)
             }}
         >
             {(formik) => {
@@ -118,7 +122,7 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
                                 </Row>
                                 <Row>
                                     <Column className={styles.firstColSyle} lg={6}>
-                                        {FieldForm("code",values.codePatient)}
+                                        {FieldForm("code", values.codePatient)}
                                     </Column>
                                     <Column className={styles.secondColStyle} lg={6}>
                                         {FieldForm("nif")}
@@ -132,7 +136,6 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
                                         {FieldForm("deathTime")}
                                     </Column>
                                 </Row>
-
                                 <Row>
                                     <Column className={styles.firstColSyle} lg={6}>
                                         {FieldForm("deathPlace")}
@@ -141,7 +144,6 @@ const DeathFormRegistry: React.FC<DeathFormProps> = ({ patient }) => {
                                         {FieldForm("deathCause")}
                                     </Column>
                                 </Row>
-
                                 <Row>
                                     <Column className={styles.firstColSyle}>
                                         {FieldForm("observation-1")}
